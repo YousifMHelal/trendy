@@ -85,9 +85,9 @@ const Page = () => {
           <IoStorefront size={20} />
           <p className="text-xl">Add new category</p>
         </div>
-        <div>
+        <div >
           {loading ? (
-            <Loader2 className="animate-spin mx-auto mr-16 h-8 w-8 text-muted-background" />
+            <Loader2 className="animate-spin mr-10 h-8 w-8 text-muted-background" />
           ) : (
             <Button size={"lg"} onClick={handleAddNewCategory}>
               <IoIosCheckmark size={30} />

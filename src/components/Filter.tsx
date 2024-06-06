@@ -30,7 +30,7 @@ const Filter = () => {
         </select>
         {/* TODO: Filter Categories */}
         <select
-          name="cat"
+          name="category"
           className="py-2 px-4 rounded-2xl text-xs font-medium bg-[#EBEDED]"
           onChange={handleFilterChange}>
           <option>Category</option>

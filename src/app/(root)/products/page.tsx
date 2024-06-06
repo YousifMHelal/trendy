@@ -2,11 +2,37 @@ import Filter from "@/components/Filter";
 import ProductCard from "@/components/ProductCard";
 import WidthContainer from "@/components/WidthContainer";
 import { Button } from "@/components/ui/button";
-import { getProducts } from "@/data/getProducts";
 import Image from "next/image";
+import { toast } from "sonner";
 
-const Page = async () => {
-  const products = await getProducts();
+export const getProducts = async (category: string | undefined) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/api/products/?category=${
+        category || " "
+      }`,
+      {
+        cache: "no-store",
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error(
+        `Failed to fetch products: ${res.status} ${res.statusText}`
+      );
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw error;
+  }
+};
+
+const Page = async ({ searchParams }: any) => {
+  const category = searchParams.category || "";
+  const products = await getProducts(category);
 
   return (
     <WidthContainer>
@@ -32,9 +58,10 @@ const Page = async () => {
         cat collection name For You!
       </h1>
       <div className="w-full grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-6 md:gap-y-10 lg:gap-x-8">
-        {products.map((product: any) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+        {products &&
+          products.map((product: any) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
       </div>
     </WidthContainer>
   );

@@ -1,9 +1,28 @@
-import { IoStorefront } from "react-icons/io5";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import { getProducts } from "@/data/getProducts";
-import { formatPrice } from "@/lib/utils";
+import { IoStorefront } from "react-icons/io5";
+
+export const getProducts = async () => {
+  try {
+    const res = await fetch(`http://localhost:3000/api/products`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      throw new Error(
+        `Failed to fetch products: ${res.status} ${res.statusText}`
+      );
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw error;
+  }
+};
 
 const page = async () => {
   const products = await getProducts();
@@ -56,22 +75,22 @@ const page = async () => {
                     <div className="relative w-8 h-8">
                       {images && (
                         <Image
-                          src={images[1]}
+                          src={images[0]}
                           alt=""
                           className="rounded-full"
                           fill
                         />
                       )}
                     </div>
-                    <span>{title}</span>
+                    <span>{title.substring(0, 18) + "..."}</span>
                   </td>
                   <td className="px-4 py-2 text-base capitalize font-medium">
-                    {description.substring(0, 50) + "..."}
+                    {description.substring(0, 40) + "..."}
                   </td>
                   <td className="px-4 py-2 text-base capitalize font-medium">
                     {formatPrice(price)}
                   </td>
-                  <td className="px-4 py-2 text-base capitalize font-medium">
+                  <td className="px-4 py-2 text-base capitalize text-nowrap font-medium">
                     {new Date(createdAt).toLocaleString("en-US", {
                       day: "numeric",
                       month: "long",

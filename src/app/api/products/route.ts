@@ -1,6 +1,7 @@
 import connectToDb from "@/lib/db";
 import { Product } from "@/models/ProductModels";
 import { NextResponse } from "next/server";
+import { NextApiRequest } from "next";
 
 export const POST = async (req: any) => {
   try {
@@ -43,10 +44,15 @@ export const POST = async (req: any) => {
   }
 };
 
-export const GET = async () => {
+export const GET = async (req: any) => {
+  const searchParams = new URLSearchParams(req.url.split("?")[1]);
+  const category = searchParams.get("category");
+
   try {
     await connectToDb();
-    const products = await Product.find();
+
+    const query = category ? { category } : {};
+    const products = await Product.find(query);
 
     if (!products.length) {
       return new NextResponse(

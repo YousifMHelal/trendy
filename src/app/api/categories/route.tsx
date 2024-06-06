@@ -6,9 +6,11 @@ export const POST = async (req: any) => {
   try {
     const { name, image } = await req.json();
 
+    const slug = name.toLowerCase().replace(/[^a-z0-9]/g, "-");
+
     await connectToDb();
 
-    const isCategoryExist = await Category.findOne({ name });
+    const isCategoryExist = await Category.findOne({ slug });
 
     if (isCategoryExist) {
       return new Response(
@@ -18,10 +20,10 @@ export const POST = async (req: any) => {
         { status: 409 } // Conflict
       );
     }
-    console.log(name, image);
 
     const newCategory = new Category({
       name,
+      slug,
       image,
     });
 

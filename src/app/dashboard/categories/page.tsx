@@ -1,8 +1,27 @@
 import { Button, buttonVariants } from "@/components/ui/button";
-import { getCategories } from "@/data/getCategories";
 import Image from "next/image";
 import Link from "next/link";
 import { IoStorefront } from "react-icons/io5";
+
+export const getCategories = async () => {
+  try {
+    const res = await fetch("http://localhost:3000/api/categories", {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      throw new Error(
+        `Failed to fetch categories: ${res.status} ${res.statusText}`
+      );
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
+  }
+};
 
 const page = async () => {
   const Categories = await getCategories();

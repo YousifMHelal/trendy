@@ -8,16 +8,13 @@ import { Skeleton } from "./ui/skeleton";
 import mongoose from "mongoose";
 
 interface IProduct {
+  _id: string;
   title: string;
   description: string;
   price: number;
   quantity: number;
   slug: string;
-  images: [
-    {
-      type: string;
-    }
-  ];
+  images: string[];
   category: {
     type: mongoose.Schema.Types.ObjectId;
   };
@@ -43,17 +40,25 @@ const ProductCard = ({ product }: { product: IProduct }) => {
           className={cn("invisible h-full w-full cursor-pointer group/main", {
             "visible animate-in fade-in-5": isVisible,
           })}
-          href={`/product/`}>
+          href={`/products/${product.slug}`}>
           <div className="flex flex-col w-full">
             <div className="relative bg-zinc-100 aspect-square w-full overflow-hidden rounded-xl">
-              <Image src="" fill alt="product" />
+              {product.images && (
+                <Image src={product.images[0]} fill alt="product" />
+              )}
             </div>
             <h3 className="mt-4 font-medium text-sm text-gray-700">
-              title
+              {product.title.length > 18
+                ? product.title.substring(0, 18) + "..."
+                : product.title}
             </h3>
-            <p className="mt-1 text-sm text-gray-500">roduc</p>
+            <p className="mt-1 text-sm text-gray-500">
+              {product.description.length > 18
+                ? product.description.substring(0, 36) + "..."
+                : product.description}
+            </p>
             <p className="mt-1 font-medium text-sm text-gray-900">
-              {formatPrice(50)}
+              {formatPrice(product.price || 0)}
             </p>
           </div>
         </Link>

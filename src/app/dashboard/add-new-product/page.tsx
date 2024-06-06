@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -14,14 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { getCategories } from "@/data/getCategories";
+import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import React, { useEffect, useState } from "react";
 import { IoIosCheckmark } from "react-icons/io";
 import { IoStorefront } from "react-icons/io5";
 import { MdDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 const Page = () => {
   const [error, setError] = useState({
@@ -49,7 +49,7 @@ const Page = () => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
-  const handleAddNewProduct = async () => { 
+  const handleAddNewProduct = async () => {
     setLoading(true);
     setError({
       title: "",
@@ -132,7 +132,6 @@ const Page = () => {
   };
 
   const [categories, setCategories] = useState([]);
-
   useEffect(() => {
     const fetchCategories = async () => {
       const categories = await getCategories();
@@ -150,14 +149,16 @@ const Page = () => {
           <IoStorefront size={20} />
           <p className="text-xl">Add new product</p>
         </div>
-        {loading ? (
-          <Loader2 className="animate-spin mx-auto h-8 w-8 text-muted-background" />
-        ) : (
-          <Button size={"lg"} onClick={handleAddNewProduct}>
-            <IoIosCheckmark size={30} />
-            Add
-          </Button>
-        )}
+        <div>
+          {loading ? (
+            <Loader2 className="animate-spin mr-10 h-8 w-8 text-muted-background" />
+          ) : (
+            <Button size={"lg"} onClick={handleAddNewProduct}>
+              <IoIosCheckmark size={30} />
+              Add
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Add new product */}
@@ -296,8 +297,16 @@ const Page = () => {
                   <SelectGroup>
                     <SelectLabel>Categories</SelectLabel>
                     {categories.map(
-                      ({ _id, name }: { _id: string; name: string }) => (
-                        <SelectItem key={_id} value={_id}>
+                      ({
+                        _id,
+                        name,
+                        slug,
+                      }: {
+                        _id: string;
+                        name: string;
+                        slug: string;
+                      }) => (
+                        <SelectItem key={_id} value={slug}>
                           {name}
                         </SelectItem>
                       )

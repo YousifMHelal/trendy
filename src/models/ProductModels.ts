@@ -7,19 +7,19 @@ interface IProduct extends Document {
   quantity: number;
   slug: string;
   images: { type: string }[];
-  category?: mongoose.Schema.Types.ObjectId;
+  category?: string;
 }
 
 const ProductSchema: Schema = new Schema(
   {
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    price: { type: Number, required: true },
-    quantity: { type: Number, required: true },
-    slug: { type: String, required: true, unique: true },
-    images: [{ type: String, required: false }],
+    title: { type: "String", required: true },
+    description: { type: "String", required: true },
+    price: { type: "Number", required: true },
+    quantity: { type: "Number", required: true },
+    slug: { type: "String", required: true, unique: true },
+    images: [{ type: "String", required: false }],
     category: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: "string",
       ref: "Category",
       required: false,
     },

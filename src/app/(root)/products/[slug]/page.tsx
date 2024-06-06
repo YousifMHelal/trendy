@@ -2,23 +2,27 @@ import AddToCartButton from "@/components/AddToCartButton";
 import ProductImages from "@/components/ProductImages";
 import WidthContainer from "@/components/WidthContainer";
 import ProductReel from "@/components/productReel";
+import { getCategory } from "@/data/getCategories";
+import { getProduct } from "@/data/getProducts";
 import { formatPrice } from "@/lib/utils";
 import { Check, Shield } from "lucide-react";
 import Link from "next/link";
-
-interface PageProps {
-  params: {
-    productId: string;
-  };
-}
 
 const BREADCRUMBS = [
   { id: 1, name: "Home", href: "/" },
   { id: 2, name: "Products", href: "/products" },
 ];
 
-const Page = async ({ params }: PageProps) => {
-  const { productId } = params;
+interface ProductPageProps {
+  params: {
+    slug: string;
+  };
+}
+
+const Page = async ({ params }: ProductPageProps) => {
+  const { slug } = params;
+  const product = await getProduct(slug);
+  const category = await getCategory(product.category);
 
   return (
     <WidthContainer className="bg-white">
@@ -52,21 +56,23 @@ const Page = async ({ params }: PageProps) => {
             {/* product information */}
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                product name
+                {product.title}
               </h1>
             </div>
 
             <section className="mt-4">
               <div className="flex items-center">
-                <p className="font-medium text-gray-900">{formatPrice(45)}</p>
+                <p className="font-medium text-gray-900">
+                  {formatPrice(product.price)}
+                </p>
                 <div className="ml-4 border-l text-muted-foreground border-gray-300 pl-4">
-                  label
+                  {category.name}
                 </div>
               </div>
 
               <div className="mt-4 space-y-6">
                 <p className="text-base text-muted-foreground">
-                  product description
+                  {product.description}
                 </p>
               </div>
 
@@ -85,7 +91,7 @@ const Page = async ({ params }: PageProps) => {
           {/* Product images */}
           <div className="mt-10 lg:col-start-2 lg:row-span-2 lg:mt-0 lg:self-center">
             <div className="aspect-square rounded-lg">
-              <ProductImages />
+              <ProductImages images={product.images} />
             </div>
           </div>
 

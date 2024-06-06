@@ -1,22 +1,23 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import CategoryCard from "./CategoryCard";
 import WidthContainer from "./WidthContainer";
+import { getCategories } from "@/data/getCategories";
 
-interface props {
-  categories: [
-    {
-      name: string;
-      image: string;
-    }
-  ];
-}
+const Categories = () => {
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const categories = await getCategories();
+      setCategories(categories);
+    };
 
-const Categories = ({ categories }: props) => {
-  
+    fetchCategories();
+  }, []);
+
+  console.log(categories);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
       if (scrollContainerRef.current) {
@@ -52,16 +53,25 @@ const Categories = ({ categories }: props) => {
         ref={scrollContainerRef}
         className="overflow-x-scroll whitespace-nowrap scrollbar-hide">
         <div className="inline-flex space-x-4 p-4">
-
-          {
-            categories.map((category) => (
-              <CategoryCard
-                key={category.name}
-                name={category.name}
-                image={category.image}
-              />
-            ))
-          }
+          {categories &&
+            categories.map(
+              ({
+                name,
+                slug,
+                image,
+              }: {
+                name: string;
+                slug: string;
+                image: string | null;
+              }) => (
+                <CategoryCard
+                  key={slug}
+                  name={name}
+                  slug={slug}
+                  image={image}
+                />
+              )
+            )}
         </div>
       </div>
     </section>

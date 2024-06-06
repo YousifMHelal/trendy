@@ -50,7 +50,7 @@ const Slider = () => {
 
   return (
     <section className="w-72 sticky left-0 top-0 flex flex-col bg-input gap-2">
-      <nav className="">
+      <nav className="w-72 sticky left-0 top-0 flex flex-col bg-input gap-2">
         {/* Admin information */}
         <div className="px-6 flex items-center gap-4 mb-2 py-6">
           <RxAvatar className="text-4xl" />
