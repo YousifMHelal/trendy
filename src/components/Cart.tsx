@@ -14,11 +14,24 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
+import CartItem from "./CartItem";
+import { useCart } from "@/hooks/useCart";
+import { useEffect, useState } from "react";
 
 const Cart = () => {
+  const { items } = useCart();
+  const itemCount = items.length;
+  const cartTotal = items.reduce(
+    (total, { product }) => total + product.price,
+    0
+  );
   const fee = 1;
-  const itemCount = 10;
-  const cartTotal = 213;
+
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <Sheet>
@@ -28,7 +41,7 @@ const Cart = () => {
           className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
         />
         <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-          {itemCount}
+          {isMounted ? itemCount : 0}
         </span>
       </SheetTrigger>
       <SheetContent className="flex w-full flex-col pr-0 sm:max-w-lg">
@@ -38,7 +51,11 @@ const Cart = () => {
         {itemCount > 0 ? (
           <>
             <div className="flex w-full flex-col pr-6">
-              <ScrollArea></ScrollArea>
+              <ScrollArea>
+                {items.map(({ product }) => (
+                  <CartItem key={product._id} product={product} />
+                ))}
+              </ScrollArea>
               Cart Item
             </div>
             <div className="space-y-4 pr-6">

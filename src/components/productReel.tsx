@@ -3,26 +3,37 @@
 import Link from "next/link";
 import ProductCard, { IProduct } from "./ProductCard";
 import { useState, useEffect } from "react";
+import { getProducts } from "@/data/getProducts";
 
 interface ProductReelProps {
   title: string;
   subTitle?: string;
   href?: string;
-  products?: IProduct[];
+  category?: string;
 }
 
 const FALLBACK_LIMIT = 6;
 
 const ProductReel = (props: ProductReelProps) => {
-  const { title, subTitle, href, products } = props;
+  const { title, subTitle, href, category } = props;
 
-  const [limitProducts, setLimitProducts] = useState<IProduct[] | null>(null);
+  const [limitedProducts, setLimitedProducts] = useState<IProduct[]>([]);
+  const [products, setProducts] = useState<IProduct[]>([]);
 
   useEffect(() => {
-    if (products) {
-      setLimitProducts(products.slice(0, FALLBACK_LIMIT));
+    const fetchProducts = async () => {
+      const response = await getProducts(category);
+      setProducts(response.products);
+    };
+
+    fetchProducts();
+  }, [category]);
+
+  useEffect(() => {
+    if (Array.isArray(products)) {
+      setLimitedProducts(products.slice(0, FALLBACK_LIMIT));
     }
-  }, [products]);
+  }, [products]); // Update limitedProducts whenever produ
 
   return (
     <section className="py-10">
@@ -47,9 +58,9 @@ const ProductReel = (props: ProductReelProps) => {
       </div>
       <div className="relative">
         <div className="mt-6 flex items-center w-full">
-          <div className="w-full grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-6 md:gap-y-10 lg:gap-x-8">
-            {limitProducts &&
-              limitProducts.map((product, i) => (
+          <div className="w-full place-items-center grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-10 sm:gap-x-6 md:gap-y-10 lg:gap-x-8">
+            {limitedProducts &&
+              limitedProducts.map((product, i) => (
                 <ProductCard key={i} product={product} />
               ))}
           </div>

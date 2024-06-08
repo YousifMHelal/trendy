@@ -30,6 +30,7 @@ const Filter = () => {
   const handleSelectChange = (value: string) => {
     const params = new URLSearchParams(searchParams);
     params.set("category", value);
+    params.set("page", "1");
     router.replace(`${pathname}?${params.toString()}`);
   };
 
@@ -48,7 +49,7 @@ const Filter = () => {
   }, []);
 
   return (
-    <div className="mt-12 flex justify-between">
+    <div className="mt-4 flex justify-between">
       <div className="flex gap-4 flex-wrap">
         {/* Filter Categories */}
         <div className="w-28">

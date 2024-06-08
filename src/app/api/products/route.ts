@@ -47,12 +47,19 @@ export const POST = async (req: any) => {
 export const GET = async (req: any) => {
   const searchParams = new URLSearchParams(req.url.split("?")[1]);
   const category = searchParams.get("category");
+  const page = parseInt(searchParams.get("page") || "1");
+
+  const PRODUCTS_PER_PAGE = 24;
 
   try {
     await connectToDb();
 
     const query = category ? { category } : {};
-    const products = await Product.find(query);
+    const products = await Product.find(query)
+      .skip(PRODUCTS_PER_PAGE * (page - 1))
+      .limit(PRODUCTS_PER_PAGE);
+
+    const count = await Product.countDocuments(query);
 
     if (!products.length) {
       return new NextResponse(
@@ -61,7 +68,9 @@ export const GET = async (req: any) => {
       );
     }
 
-    return new NextResponse(JSON.stringify(products), { status: 200 });
+    return new NextResponse(JSON.stringify({ products, count }), {
+      status: 200,
+    });
   } catch (err) {
     console.error("Error fetching products:", err);
     return new NextResponse(

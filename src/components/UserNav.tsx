@@ -40,7 +40,9 @@ const UserNav = ({ user }: props) => {
         <DropdownMenuSeparator />
         {isAdmin && (
           <DropdownMenuItem asChild>
-            <Link href="/dashboard" className="cursor-pointer">Dashboard</Link>
+            <Link href="/dashboard" className="cursor-pointer">
+              Dashboard
+            </Link>
           </DropdownMenuItem>
         )}
 

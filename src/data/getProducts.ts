@@ -1,7 +1,10 @@
-export const getProducts = async (category?: string | undefined) => {
+export const getProducts = async (
+  category?: string | undefined,
+  page?: number | undefined
+) => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/products/?category=${
+      `${process.env.NEXT_PUBLIC_URL}/api/products/?page=${page}&category=${
         category || " "
       }`,
       {

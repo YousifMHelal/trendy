@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
+import { useCart } from "@/hooks/useCart";
+import { IProduct } from "./ProductCard";
 
-
-// { product }: { product: Product }
-
-const AddToCartButton = () => {
+const AddToCartButton = ({ product }: { product: IProduct }) => {
+  const { addItem } = useCart();
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
   useEffect(() => {
@@ -19,8 +19,10 @@ const AddToCartButton = () => {
   return (
     <Button
       onClick={() => {
+        addItem(product);
         setIsSuccess(true);
       }}
+      disabled={isSuccess}
       size="lg"
       className="w-full">
       {isSuccess ? "Added!" : "Add to cart"}

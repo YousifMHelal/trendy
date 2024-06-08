@@ -23,7 +23,6 @@ const Page = async ({ params }: ProductPageProps) => {
   const { slug } = params;
   const product = await getProduct(slug);
   const category = await getCategory(product.category);
-  const similar = await getProducts(category.slug);
 
   return (
     <WidthContainer className="bg-white">
@@ -100,7 +99,7 @@ const Page = async ({ params }: ProductPageProps) => {
           <div className="mt-8 lg:col-start-1 lg:row-start-2 lg:max-w-lg lg:self-start">
             <div>
               <div className="mt-8">
-                <AddToCartButton />
+                <AddToCartButton product={product} />
               </div>
               <div className="mt-6 text-center">
                 <div className="group inline-flex text-sm text-medium">
@@ -118,14 +117,12 @@ const Page = async ({ params }: ProductPageProps) => {
         </div>
       </div>
 
-      {similar && (
-        <ProductReel
-          href={`/products/?category=${category.slug}`}
-          title={`Similar`}
-          subTitle={`Browse similar high-quality products just like ${product.title}`}
-          products={similar}
-        />
-      )}
+      <ProductReel
+        href={`/products/?category=${category.slug}`}
+        title={`Similar`}
+        subTitle={`Browse similar high-quality products just like ${product.title}`}
+        category={category.slug}
+      />
     </WidthContainer>
   );
 };

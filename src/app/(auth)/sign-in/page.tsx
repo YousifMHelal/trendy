@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Label } from "@radix-ui/react-label";
 import { ArrowRight, Loader2, Store } from "lucide-react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -13,6 +13,9 @@ import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
 
 const Page = () => {
+  const { data } = useSession();
+  const isAdmin = data?.user.isAdmin;
+
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({
@@ -22,7 +25,7 @@ const Page = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email)
@@ -30,7 +33,6 @@ const Page = () => {
         ...prev,
         email: "Field is required",
       }));
-
     if (!password)
       setError((prev) => ({
         ...prev,

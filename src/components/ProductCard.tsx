@@ -37,18 +37,18 @@ const ProductCard = ({ product }: { product: IProduct }) => {
     return (
       <>
         <Link
-          className={cn("invisible h-full w-full cursor-pointer group/main", {
+          className={cn("invisible h-full w-40 cursor-pointer group/main", {
             "visible animate-in fade-in-5": isVisible,
           })}
           href={`/products/${product.slug}`}>
           <div className="flex flex-col w-full">
-            <div className="relative bg-zinc-100 aspect-square w-full overflow-hidden rounded-xl">
+            <div className="relative shadow-xl aspect-square w-full overflow-hidden rounded-xl">
               {product.images && (
                 <Image
                   src={product.images[0]}
                   fill
                   alt="product"
-                  className="object-contain"
+                  className="object-contain p-3"
                 />
               )}
             </div>

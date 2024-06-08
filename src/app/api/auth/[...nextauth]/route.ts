@@ -57,11 +57,11 @@ export const authOptions = {
               name,
               email,
               image,
-              isAdmin: false, // Ensure isAdmin is set to false for new users
+              isAdmin: false,
             });
             await newUser.save();
             console.log("New user saved");
-            isUserExist = newUser; // Update isUserExist to the new user
+            isUserExist = newUser;
           }
 
           user.isAdmin = isUserExist.isAdmin;

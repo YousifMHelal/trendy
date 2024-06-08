@@ -25,7 +25,7 @@ export const getProducts = async () => {
 };
 
 const page = async () => {
-  const products = await getProducts();
+  const { products } = await getProducts();
 
   return (
     <section className="flex flex-col">
