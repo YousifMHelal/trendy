@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 import mongoose from "mongoose";
 
-interface IProduct {
+export interface IProduct {
   _id: string;
   title: string;
   description: string;
@@ -44,7 +44,12 @@ const ProductCard = ({ product }: { product: IProduct }) => {
           <div className="flex flex-col w-full">
             <div className="relative bg-zinc-100 aspect-square w-full overflow-hidden rounded-xl">
               {product.images && (
-                <Image src={product.images[0]} fill alt="product" />
+                <Image
+                  src={product.images[0]}
+                  fill
+                  alt="product"
+                  className="object-contain"
+                />
               )}
             </div>
             <h3 className="mt-4 font-medium text-sm text-gray-700">
@@ -52,7 +57,7 @@ const ProductCard = ({ product }: { product: IProduct }) => {
                 ? product.title.substring(0, 18) + "..."
                 : product.title}
             </h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 lowercase">
               {product.description.length > 18
                 ? product.description.substring(0, 36) + "..."
                 : product.description}

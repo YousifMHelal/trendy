@@ -15,7 +15,7 @@ const ProductImages = ({ images }: { images: string[] }) => {
             alt={`Product image ${index + 1}`}
             fill
             sizes="50vw"
-            className="object-cover rounded-md"
+            className="object-contain rounded-md"
           />
         )}
       </div>
@@ -31,7 +31,7 @@ const ProductImages = ({ images }: { images: string[] }) => {
                 alt={`Thumbnail ${i + 1}`}
                 fill
                 sizes="30vw"
-                className="object-cover rounded-md"
+                className="object-contain rounded-md"
               />
             </div>
           ))}

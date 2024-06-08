@@ -1,8 +1,17 @@
-export const getProducts = async () => {
+export const getProducts = async (category?: string | undefined) => {
   try {
-    const res = await fetch(`http://localhost:3000/api/products`, {
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/api/products/?category=${
+        category || " "
+      }`,
+      {
+        cache: "no-store",
+      }
+    );
+
+    if (res.status === 404) {
+      return;
+    }
 
     if (!res.ok) {
       throw new Error(

@@ -1,18 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import ProductCard from "./ProductCard";
+import ProductCard, { IProduct } from "./ProductCard";
+import { useState, useEffect } from "react";
 
 interface ProductReelProps {
   title: string;
   subTitle?: string;
   href?: string;
+  products?: IProduct[];
 }
 
-const FALLBACK_LIMIT = 5;
+const FALLBACK_LIMIT = 6;
 
 const ProductReel = (props: ProductReelProps) => {
-  const { title, subTitle, href } = props;
+  const { title, subTitle, href, products } = props;
+
+  const [limitProducts, setLimitProducts] = useState<IProduct[] | null>(null);
+
+  useEffect(() => {
+    if (products) {
+      setLimitProducts(products.slice(0, FALLBACK_LIMIT));
+    }
+  }, [products]);
 
   return (
     <section className="py-10">
@@ -38,7 +48,10 @@ const ProductReel = (props: ProductReelProps) => {
       <div className="relative">
         <div className="mt-6 flex items-center w-full">
           <div className="w-full grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-6 md:gap-y-10 lg:gap-x-8">
-            
+            {limitProducts &&
+              limitProducts.map((product, i) => (
+                <ProductCard key={i} product={product} />
+              ))}
           </div>
         </div>
       </div>

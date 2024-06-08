@@ -14,7 +14,14 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { getCategories } from "@/data/getCategories";
+import { app } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
@@ -22,6 +29,8 @@ import { IoIosCheckmark } from "react-icons/io";
 import { IoStorefront } from "react-icons/io5";
 import { MdDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
+
+const storage = getStorage(app);
 
 const Page = () => {
   const [error, setError] = useState({
@@ -35,20 +44,73 @@ const Page = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [images, setImages] = useState<File[]>([]);
   const [quantity, setQuantity] = useState("");
   const [category, setCategory] = useState("");
-  const [images, setImages] = useState<string[]>([]);
+  const [media, setMedia] = useState<string[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
+  // Handle image preview and delete
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files as FileList);
-    const imageUrls = files.map((file: File) => URL.createObjectURL(file));
-    setImages((prevImages) => [...prevImages, ...imageUrls]);
+    setImages((prevImages) => [...prevImages, ...files]);
+
+    const previews = Array.from(files).map((file) => URL.createObjectURL(file));
+    setImagePreviews((prevPreviews) => [...prevPreviews, ...previews]);
   };
 
   const handleDeleteImage = (index: number) => {
+    setImagePreviews((prevImages) => prevImages.filter((_, i) => i !== index));
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
+  // Upload images to Firebase and return URLs
+  const uploadImages = async (): Promise<string[]> => {
+    const newMedia: string[] = [];
+    for (let index = 0; index < images.length; index++) {
+      const image = images[index];
+      const name = new Date().getTime() + image.name;
+      const storageRef = ref(storage, name);
+
+      const uploadTask = uploadBytesResumable(storageRef, image);
+
+      await new Promise<void>((resolve, reject) => {
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log(`Upload ${index + 1} is ${progress}% done`);
+            switch (snapshot.state) {
+              case "paused":
+                console.log(`Upload ${index + 1} is paused`);
+                break;
+              case "running":
+                console.log(`Upload ${index + 1} is running`);
+                break;
+            }
+          },
+          (error) => {
+            console.error("Error while uploading:", error);
+            reject(error);
+          },
+          async () => {
+            try {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              console.log(`File ${index + 1} available at`, downloadURL);
+              newMedia.push(downloadURL);
+              resolve();
+            } catch (error) {
+              reject(error);
+            }
+          }
+        );
+      });
+    }
+    return newMedia;
+  };
+
+  // Add new product to DB
   const handleAddNewProduct = async () => {
     setLoading(true);
     setError({
@@ -102,7 +164,10 @@ const Page = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/products", {
+      const uploadedMedia = await uploadImages();
+      setMedia(uploadedMedia);
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/products`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -112,7 +177,7 @@ const Page = () => {
           description,
           price: Number(price),
           quantity: Number(quantity),
-          images,
+          images: uploadedMedia,
           category,
         }),
       });
@@ -120,6 +185,9 @@ const Page = () => {
 
       if (res.ok) {
         toast.success("Product created successfully");
+        setImages([]);
+        setMedia([]);
+        setImagePreviews([]);
       } else {
         toast.error(data.message);
       }
@@ -131,6 +199,7 @@ const Page = () => {
     }
   };
 
+  // Fetch the categories
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     const fetchCategories = async () => {
@@ -140,7 +209,6 @@ const Page = () => {
 
     fetchCategories();
   }, []);
-
   return (
     <section className="flex flex-col">
       {/* Page information */}
@@ -222,18 +290,18 @@ const Page = () => {
             {/* The image preview */}
             <div className="flex flex-col gap-4 p-5 rounded-xl">
               <div className="flex items-center justify-center flex-wrap gap-4 mt-4">
-                {images ? (
-                  images.map((image, index) => (
+                {imagePreviews ? (
+                  imagePreviews.map((image, index) => (
                     <div key={index} className="relative h-28 w-28">
                       <Image
-                        className="rounded object-cover"
+                        className="rounded object-contain"
                         fill
                         src={image}
                         alt={`Uploaded ${index + 1}`}
                       />
                       <MdDeleteForever
                         size={24}
-                        className="absolute top-0 right-0 cursor-pointer"
+                        className="absolute top-0 right-0 cursor-pointer text-red-700"
                         onClick={() => handleDeleteImage(index)}
                       />
                     </div>

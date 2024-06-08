@@ -11,6 +11,15 @@ import { IoStorefront } from "react-icons/io5";
 import { MdDeleteForever } from "react-icons/md";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
+import { app } from "@/lib/firebase";
+
+const storage = getStorage(app);
 
 const Page = () => {
   const [error, setError] = useState({
@@ -48,22 +57,26 @@ const Page = () => {
     }
 
     try {
-      console.log(name, image);
+      let imageUrl = null;
 
-      const res = await fetch("http://localhost:3000/api/categories", {
+      if (image) {
+        imageUrl = await uploadImage(image);
+      }
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/categories`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name,
-          image,
+          image: imageUrl, // Use the uploaded image URL
         }),
       });
       const data = await res.json();
 
       if (res.ok) {
-        toast.success("Product created successfully");
+        toast.success("Category created successfully");
         setName("");
         setImage(null);
       } else {
@@ -77,6 +90,42 @@ const Page = () => {
     }
   };
 
+  const uploadImage = (imageUrl: string): Promise<string> => {
+    return new Promise(async (resolve, reject) => {
+      const file = await fetch(imageUrl).then((res) => res.blob());
+      const name = new Date().getTime() + ".jpg";
+      const storageRef = ref(storage, name);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress =
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (error) => {
+          console.error("Error during upload:", error);
+          reject(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log("File available at", downloadURL);
+            resolve(downloadURL);
+          });
+        }
+      );
+    });
+  };
+
   return (
     <section className="flex flex-col">
       {/* Page information */}
@@ -85,7 +134,7 @@ const Page = () => {
           <IoStorefront size={20} />
           <p className="text-xl">Add new category</p>
         </div>
-        <div >
+        <div>
           {loading ? (
             <Loader2 className="animate-spin mr-10 h-8 w-8 text-muted-background" />
           ) : (
@@ -139,19 +188,19 @@ const Page = () => {
               </div>
             </div>
             {/* The image preview */}
-            <div className="flex flex-col gap-4 p-5 rounded-xl">
+            <div className="flex flex-col gap-4 p-2 rounded-xl">
               <div className="flex items-center justify-center flex-wrap gap-4 mt-4">
                 {image ? (
-                  <div className="relative h-28 w-28">
+                  <div className="relative h-72 w-72">
                     <Image
-                      className="rounded object-cover"
+                      className="rounded object-contain"
                       fill
                       src={image}
                       alt="Uploaded Image"
                     />
                     <MdDeleteForever
                       size={24}
-                      className="absolute top-0 right-0 cursor-pointer"
+                      className="absolute top-0 right-0 text-red-700 cursor-pointer"
                       onClick={handleDeleteImage}
                     />
                   </div>

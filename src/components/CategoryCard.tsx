@@ -36,8 +36,15 @@ const ProductCard = ({
           })}
           href={`/products?category=${slug}`}>
           <div className="flex flex-col w-full">
-            <div className="relative bg-zinc-100 aspect-square w-full overflow-hidden rounded-xl">
-              {image && <Image src={image} fill alt="product" />}
+            <div className="relative bg-input aspect-square w-full overflow-hidden rounded-xl shadow-xl">
+              {image && (
+                <Image
+                  src={image}
+                  fill
+                  alt="product"
+                  className="object-cover rounded-xl"
+                />
+              )}
             </div>
             <h3 className="mt-4 mx-auto font-medium text-sm text-gray-700">
               {name}

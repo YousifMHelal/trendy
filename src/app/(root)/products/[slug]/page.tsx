@@ -3,7 +3,7 @@ import ProductImages from "@/components/ProductImages";
 import WidthContainer from "@/components/WidthContainer";
 import ProductReel from "@/components/productReel";
 import { getCategory } from "@/data/getCategories";
-import { getProduct } from "@/data/getProducts";
+import { getProduct, getProducts } from "@/data/getProducts";
 import { formatPrice } from "@/lib/utils";
 import { Check, Shield } from "lucide-react";
 import Link from "next/link";
@@ -23,6 +23,7 @@ const Page = async ({ params }: ProductPageProps) => {
   const { slug } = params;
   const product = await getProduct(slug);
   const category = await getCategory(product.category);
+  const similar = await getProducts(category.slug);
 
   return (
     <WidthContainer className="bg-white">
@@ -117,11 +118,14 @@ const Page = async ({ params }: ProductPageProps) => {
         </div>
       </div>
 
-      <ProductReel
-        href="/products"
-        title={`Similar`}
-        subTitle={`Browse similar high-quality label just like 'product name'`}
-      />
+      {similar && (
+        <ProductReel
+          href={`/products/?category=${category.slug}`}
+          title={`Similar`}
+          subTitle={`Browse similar high-quality products just like ${product.title}`}
+          products={similar}
+        />
+      )}
     </WidthContainer>
   );
 };

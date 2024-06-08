@@ -1,75 +1,109 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { useEffect, useState } from "react";
+import { getCategories } from "@/data/getCategories";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 const Filter = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { replace } = useRouter();
+  const router = useRouter();
 
-  const handleFilterChange = (
-    e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
-  ) => {
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const params = new URLSearchParams(searchParams);
     params.set(name, value);
-    replace(`${pathname}?${params.toString()}`);
+    router.replace(`${pathname}?${params.toString()}`);
   };
+
+  const handleSelectChange = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("category", value);
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  const clearAllFilters = () => {
+    router.replace(pathname);
+  };
+
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const categories = await getCategories();
+      setCategories(categories);
+    };
+
+    fetchCategories();
+  }, []);
 
   return (
     <div className="mt-12 flex justify-between">
       <div className="flex gap-4 flex-wrap">
-        <select
-          name="type"
-          id=""
-          className="py-2 px-4 rounded-2xl text-xs font-medium bg-[#EBEDED]"
-          onChange={handleFilterChange}>
-          <option>Type</option>
-          <option value="physical">Physical</option>
-          <option value="digital">Digital</option>
-        </select>
-        {/* TODO: Filter Categories */}
-        <select
-          name="category"
-          className="py-2 px-4 rounded-2xl text-xs font-medium bg-[#EBEDED]"
-          onChange={handleFilterChange}>
-          <option>Category</option>
-          <option value="">New Arrival</option>
-          <option value="">Popular</option>
-        </select>
-        <input
-          type="text"
+        {/* Filter Categories */}
+        <div className="w-28">
+          <Select name="category" onValueChange={handleSelectChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Categories</SelectLabel>
+                {categories.map(({ name, slug }) => (
+                  <SelectItem key={slug} value={slug}>
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        <Input
+          type="number"
+          min={0}
           name="min"
           placeholder="min price"
-          className="text-xs rounded-2xl pl-2 px-4 py-2 w-24 ring-1 ring-ring"
+          className="w-28"
           onChange={handleFilterChange}
         />
-        <input
-          type="text"
+        <Input
+          type="number"
+          min={0}
           name="max"
           placeholder="max price"
-          className="text-xs rounded-2xl pl-2 py-2 px-4 w-24 ring-1 ring-ring"
+          className="w-28"
           onChange={handleFilterChange}
         />
-        <select
-          name=""
-          id=""
-          className="py-2 px-4 rounded-2xl text-xs font-medium bg-[#EBEDED]">
-          <option>All Filters</option>
-        </select>
+
+        <Button size={"lg"} onClick={clearAllFilters}>
+          Clear
+        </Button>
       </div>
-      <div>
-        <select
-          name="sort"
-          id=""
-          className="py-2 px-4 rounded-2xl text-xs font-medium bg-white ring-1 ring-gray-400"
-          onChange={handleFilterChange}>
-          <option>Sort By</option>
-          <option value="asc price">Price (low to high)</option>
-          <option value="desc price">Price (high to low)</option>
-          <option value="asc lastUpdated">Newest</option>
-          <option value="desc lastUpdated">Oldest</option>
-        </select>
+      <div className="w-44">
+        <Select name="sort">
+          <SelectTrigger>
+            <SelectValue placeholder="Sort By" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Sort By</SelectLabel>
+              <SelectItem value="asc price">Price (low to high)</SelectItem>
+              <SelectItem value="desc price">Price (high to low)</SelectItem>
+              <SelectItem value="asc lastUpdated">Newest</SelectItem>
+              <SelectItem value="desc lastUpdated">Oldest</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
