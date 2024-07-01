@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { useCart } from "@/hooks/useCart";
 import { IProduct } from "./ProductCard";
+import { useCart } from "@/store/useCart";
 
 const AddToCartButton = ({ product }: { product: IProduct }) => {
   const { addItem } = useCart();
@@ -18,11 +18,11 @@ const AddToCartButton = ({ product }: { product: IProduct }) => {
 
   return (
     <Button
+      disabled={product.quantity <= 0 || isSuccess}
       onClick={() => {
         addItem(product);
         setIsSuccess(true);
       }}
-      disabled={isSuccess}
       size="lg"
       className="w-full">
       {isSuccess ? "Added!" : "Add to cart"}

@@ -18,6 +18,7 @@ export interface IProduct {
   category: {
     type: mongoose.Schema.Types.ObjectId;
   };
+  createdAt: Date;
 }
 
 const ProductCard = ({ product }: { product: IProduct }) => {

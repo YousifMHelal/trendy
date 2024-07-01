@@ -15,8 +15,8 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 import CartItem from "./CartItem";
-import { useCart } from "@/hooks/useCart";
 import { useEffect, useState } from "react";
+import { useCart } from "@/store/useCart";
 
 const Cart = () => {
   const { items } = useCart();

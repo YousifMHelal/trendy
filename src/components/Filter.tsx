@@ -1,6 +1,10 @@
 "use client";
 
+import useCategoriesStore from "@/store/useCategoriesStore";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import {
   Select,
   SelectContent,
@@ -10,43 +14,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { useEffect, useState } from "react";
-import { getCategories } from "@/data/getCategories";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
 
 const Filter = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const params = new URLSearchParams(searchParams);
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const params = new URLSearchParams(searchParams);
     params.set(name, value);
     router.replace(`${pathname}?${params.toString()}`);
   };
 
   const handleSelectChange = (value: string) => {
-    const params = new URLSearchParams(searchParams);
     params.set("category", value);
     params.set("page", "1");
     router.replace(`${pathname}?${params.toString()}`);
   };
 
   const clearAllFilters = () => {
-    router.replace(pathname);
+    params.delete("category");
+    params.set("page", "1");
+    router.replace(`${pathname}?${params.toString()}`);
   };
 
-  const [categories, setCategories] = useState([]);
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const categories = await getCategories();
-      setCategories(categories);
-    };
+  const { categories, fetchCategories } = useCategoriesStore();
 
+  useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   return (
     <div className="mt-4 flex justify-between">

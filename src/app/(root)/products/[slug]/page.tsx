@@ -1,12 +1,15 @@
+"use client";
+
 import AddToCartButton from "@/components/AddToCartButton";
 import ProductImages from "@/components/ProductImages";
 import WidthContainer from "@/components/WidthContainer";
 import ProductReel from "@/components/productReel";
-import { getCategory } from "@/data/getCategories";
-import { getProduct, getProducts } from "@/data/getProducts";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice } from "@/lib/utils";
+import useProductStore from "@/store/useProductStore";
 import { Check, Shield } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
 
 const BREADCRUMBS = [
   { id: 1, name: "Home", href: "/" },
@@ -19,10 +22,15 @@ interface ProductPageProps {
   };
 }
 
-const Page = async ({ params }: ProductPageProps) => {
+const Page = ({ params }: ProductPageProps) => {
   const { slug } = params;
-  const product = await getProduct(slug);
-  const category = await getCategory(product.category);
+  const { product, fetchProduct, loading } = useProductStore();
+
+  useEffect(() => {
+    if (slug) {
+      fetchProduct(slug as string);
+    }
+  }, [fetchProduct, slug]);
 
   return (
     <WidthContainer className="bg-white">
@@ -55,26 +63,53 @@ const Page = async ({ params }: ProductPageProps) => {
             </ol>
             {/* product information */}
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                {product.title}
-              </h1>
+              {loading ? (
+                <div className="space-y-2 mt-3">
+                  <Skeleton className="h-4 w-[450px]" />
+                  <Skeleton className="h-4 w-[300px]" />
+                </div>
+              ) : (
+                <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                  {product?.title}
+                </h1>
+              )}
             </div>
 
             <section className="mt-4">
               <div className="flex items-center">
                 <p className="font-medium text-gray-900">
-                  {formatPrice(product.price)}
+                  {product && formatPrice(product.price)}
                 </p>
-                <div className="ml-4 border-l text-muted-foreground border-gray-300 pl-4">
-                  {category.name}
+                <div className="ml-4 border-l text-muted-foreground capitalize border-gray-300 pl-4">
+                  {product?.category.toString()}
                 </div>
               </div>
 
               <div className="mt-4 space-y-6">
-                <p className="text-base text-muted-foreground">
-                  {product.description}
+                <p className="text-base text-foreground">
+                  {product && product.quantity > 0
+                    ? " In stock"
+                    : "Out of stock"}
                 </p>
               </div>
+
+              {loading ? (
+                <div className="space-y-2 mt-10">
+                  <Skeleton className="h-4 w-[500px]" />
+                  <Skeleton className="h-4 w-[500px]" />
+                  <Skeleton className="h-4 w-[500px]" />
+                  <Skeleton className="h-4 w-[500px]" />
+                  <Skeleton className="h-4 w-[500px]" />
+                  <Skeleton className="h-4 w-[500px]" />
+                  <Skeleton className="h-4 w-[300px]" />
+                </div>
+              ) : (
+                <div className="mt-4 space-y-6">
+                  <p className="text-base text-muted-foreground">
+                    {product?.description}
+                  </p>
+                </div>
+              )}
 
               <div className="mt-6 flex items-center">
                 <Check
@@ -90,16 +125,27 @@ const Page = async ({ params }: ProductPageProps) => {
 
           {/* Product images */}
           <div className="mt-10 lg:col-start-2 lg:row-span-2 lg:mt-0 lg:self-center">
-            <div className="aspect-square rounded-lg">
-              <ProductImages images={product.images} />
-            </div>
+            {loading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-[300px] w-[500px]" />
+                <div className="flex justify-between gap-4">
+                  <Skeleton className="w-1/4 h-32" />
+                  <Skeleton className="w-1/4 h-32" />
+                  <Skeleton className="w-1/4 h-32" />
+                </div>
+              </div>
+            ) : (
+              <div className="aspect-square rounded-lg">
+                {product && <ProductImages images={product.images} />}
+              </div>
+            )}
           </div>
 
           {/* add to cart part */}
           <div className="mt-8 lg:col-start-1 lg:row-start-2 lg:max-w-lg lg:self-start">
             <div>
               <div className="mt-8">
-                <AddToCartButton product={product} />
+                {product && <AddToCartButton product={product} />}
               </div>
               <div className="mt-6 text-center">
                 <div className="group inline-flex text-sm text-medium">
@@ -118,10 +164,10 @@ const Page = async ({ params }: ProductPageProps) => {
       </div>
 
       <ProductReel
-        href={`/products/?category=${category.slug}`}
+        href={`/products/?category=${product?.category}`}
         title={`Similar`}
-        subTitle={`Browse similar high-quality products just like ${product.title}`}
-        category={category.slug}
+        subTitle={`Browse similar high-quality products just like ${product?.title}`}
+        category={product?.category.toString()}
       />
     </WidthContainer>
   );

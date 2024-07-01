@@ -1,9 +1,9 @@
 "use client";
 
+import useProductsStore from "@/store/useProductsStore";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import ProductCard, { IProduct } from "./ProductCard";
-import { useState, useEffect } from "react";
-import { getProducts } from "@/data/getProducts";
 
 interface ProductReelProps {
   title: string;
@@ -18,22 +18,19 @@ const ProductReel = (props: ProductReelProps) => {
   const { title, subTitle, href, category } = props;
 
   const [limitedProducts, setLimitedProducts] = useState<IProduct[]>([]);
-  const [products, setProducts] = useState<IProduct[]>([]);
+
+  const { productsData, fetchProducts, loading } = useProductsStore();
+  const { products } = productsData;
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      const response = await getProducts(category);
-      setProducts(response.products);
-    };
-
-    fetchProducts();
-  }, [category]);
+    fetchProducts(category);
+  }, [fetchProducts, category]);
 
   useEffect(() => {
     if (Array.isArray(products)) {
       setLimitedProducts(products.slice(0, FALLBACK_LIMIT));
     }
-  }, [products]); // Update limitedProducts whenever produ
+  }, [products]);
 
   return (
     <section className="py-10">
@@ -43,7 +40,7 @@ const ProductReel = (props: ProductReelProps) => {
             <h1 className="text-2xl font-bold text-primary sm:text-3xl">
               {title}
             </h1>
-          )}{" "}
+          )}
           {subTitle && (
             <p className="mt-2 text-sm text-muted-foreground">{subTitle}</p>
           )}

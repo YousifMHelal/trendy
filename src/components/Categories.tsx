@@ -1,22 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import CategoryCard from "./CategoryCard";
 import WidthContainer from "./WidthContainer";
-import { getCategories } from "@/data/getCategories";
+import useCategoriesStore from "@/store/useCategoriesStore";
 
 const Categories = () => {
-  const [categories, setCategories] = useState([]);
+  const { categories, fetchCategories } = useCategoriesStore();
+
   useEffect(() => {
-    const fetchCategories = async () => {
-      const categories = await getCategories();
-      setCategories(categories);
-    };
-
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
-  console.log(categories);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {

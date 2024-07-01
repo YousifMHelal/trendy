@@ -1,15 +1,17 @@
 import mongoose from "mongoose";
 
-interface Icategrey {
+export interface ICategory {
+  _id: string;
   name: string;
   slug: string;
   image: string;
+  createdAt: Date;
 }
 
-const categorySchema = new mongoose.Schema<Icategrey>(
+const categorySchema = new mongoose.Schema<ICategory>(
   {
-    name: { type: "string", required: true},
-    slug: { type: "string", required: true, unique: true},
+    name: { type: "string", required: true },
+    slug: { type: "string", required: true, unique: true },
     image: { type: "string", required: false },
   },
   {
@@ -19,4 +21,4 @@ const categorySchema = new mongoose.Schema<Icategrey>(
 
 export const Category =
   mongoose.models.Category ||
-  mongoose.model<Icategrey>("Category", categorySchema);
+  mongoose.model<ICategory>("Category", categorySchema);

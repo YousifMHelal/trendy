@@ -13,9 +13,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { getCategories } from "@/data/getCategories";
 import { app } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
+import useCategoriesStore from "@/store/useCategoriesStore";
 import {
   getDownloadURL,
   getStorage,
@@ -200,15 +200,12 @@ const Page = () => {
   };
 
   // Fetch the categories
-  const [categories, setCategories] = useState([]);
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const categories = await getCategories();
-      setCategories(categories);
-    };
+  const { categories, fetchCategories } = useCategoriesStore();
 
+  useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
+
   return (
     <section className="flex flex-col">
       {/* Page information */}
