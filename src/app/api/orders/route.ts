@@ -36,3 +36,19 @@ export const POST = async (req: any) => {
     );
   }
 };
+
+export const GET = async () => {
+  try {
+    await connectToDb();
+
+    const orders = await OrderModels.find({});
+
+    return new NextResponse(JSON.stringify(orders), { status: 200 });
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return new NextResponse(
+      JSON.stringify({ message: "Internal server error." }),
+      { status: 500 }
+    );
+  }
+};

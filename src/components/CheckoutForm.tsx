@@ -7,10 +7,9 @@ import {
 } from "@stripe/react-stripe-js";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
-import { formatPrice } from "@/lib/utils";
 
 type OrderData = {
   products: {
@@ -37,11 +36,7 @@ const CheckoutForm = ({ total }: { total: number }) => {
   const user = data?.user;
 
   const [checkoutData, setCheckoutData] = useState<OrderData>({
-    products: items.map((item) => ({
-      _id: item.product._id,
-      title: item.product.title,
-      quantity: 5,
-    })),
+    products: [],
     buyer: {
       _id: user?.id || "",
       email: user?.email || "",
@@ -49,7 +44,19 @@ const CheckoutForm = ({ total }: { total: number }) => {
     totalAmount: total,
   });
 
-  console.log(total);
+  useEffect(() => {
+    if (items.length > 0) {
+      const products = items.map((item) => ({
+        _id: item.product._id,
+        title: item.product.title,
+        quantity: item.qty,
+      }));
+      setCheckoutData((prevData) => ({
+        ...prevData,
+        products,
+      }));
+    }
+  }, [items]);
 
   const handleSubmit = async (event: any) => {
     setLoading(true);
@@ -84,7 +91,7 @@ const CheckoutForm = ({ total }: { total: number }) => {
       });
 
       if (result.error) {
-        console.log(result.error.message);
+        toast.error(result.error.message);
       }
     } catch (error) {
       console.error("Error during payment:", error);

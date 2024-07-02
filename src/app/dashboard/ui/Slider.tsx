@@ -18,6 +18,11 @@ const links = [
     href: "/dashboard",
   },
   {
+    name: "Orders",
+    icon: MdDashboard,
+    href: "/dashboard/orders",
+  },
+  {
     name: "Products",
     icon: BiSolidCartAdd,
     href: "/dashboard/products",
@@ -25,7 +30,7 @@ const links = [
   {
     name: "Add Products",
     icon: HiViewGridAdd,
-    href: "/dashboard/add-new-product",
+    href: "/dashboard/products/add-new",
   },
   {
     name: "categories",
@@ -35,7 +40,7 @@ const links = [
   {
     name: "Add category",
     icon: RiApps2AddFill,
-    href: "/dashboard/add-new-category",
+    href: "/dashboard/categories/add-new",
   },
   {
     name: "Logout",

@@ -6,9 +6,9 @@
 - TailwindCSS
 - Shadcn
 - Stripe
-- zustand
-- firebase
-- mogodb
+- Zustand
+- Firebase
+- Mogodb
 
 **Prerequisites**
 

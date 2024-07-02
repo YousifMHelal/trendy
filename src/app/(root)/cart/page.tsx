@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Page = () => {
-  const { items, removeItem } = useCart();
+  const { items, removeItem, updateItemQty } = useCart();
   const router = useRouter();
   const checkoutProducts = items.map(({ product }) => product);
   const [isMounted, setIsMounted] = useState<boolean>(false);
@@ -21,15 +21,17 @@ const Page = () => {
   }>({});
   const [totalPrices, setTotalPrices] = useState<{ [key: string]: number }>({});
 
+  const fee = 1;
+
   useEffect(() => {
     setIsMounted(true);
 
     const initialQuantities: { [key: string]: number } = {};
     const initialTotalPrices: { [key: string]: number } = {};
 
-    items.forEach(({ product }) => {
-      initialQuantities[product._id] = 1;
-      initialTotalPrices[product._id] = product.price;
+    items.forEach(({ product, qty }) => {
+      initialQuantities[product._id] = qty;
+      initialTotalPrices[product._id] = product.price * qty;
     });
 
     setProductQuantities(initialQuantities);
@@ -41,14 +43,16 @@ const Page = () => {
     0
   );
 
+  console.log(cartTotal);
+
   const createCheckout = async () => {
     const checkoutData = {
       products: checkoutProducts,
-      total: cartTotal + fee,
     };
 
+    const total = cartTotal + fee;
     localStorage.setItem("checkoutData", JSON.stringify(checkoutData));
-    router.push("/checkout");
+    router.push(`/checkout?total=${total}`);
   };
 
   const handleCountChange = (
@@ -56,6 +60,7 @@ const Page = () => {
     product: IProduct
   ) => {
     const quantity = Number(e.target.value);
+
     setProductQuantities((prev) => ({
       ...prev,
       [product._id]: quantity,
@@ -64,9 +69,12 @@ const Page = () => {
       ...prev,
       [product._id]: quantity * product.price,
     }));
+
+    // Update the quantity in the global cart state
+    updateItemQty(product._id, quantity);
   };
 
-  const fee = 1;
+  if (!isMounted) return null;
 
   return (
     <div className="bg-white">

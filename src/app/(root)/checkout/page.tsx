@@ -8,6 +8,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { StripeElementsOptions, loadStripe } from "@stripe/stripe-js";
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const stripePromise = loadStripe(
@@ -16,11 +17,13 @@ const stripePromise = loadStripe(
 
 interface CheckoutData {
   products: IProduct[];
-  total: number;
 }
 
 const Page = () => {
   const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null);
+
+  const searchParams = useSearchParams();
+  const amount = Number(searchParams.get("total"));
 
   useEffect(() => {
     try {
@@ -33,14 +36,14 @@ const Page = () => {
     }
   }, []);
 
-  const total = checkoutData?.total ?? 100;
   const products = checkoutData?.products;
 
   const options: StripeElementsOptions = {
     mode: "payment",
     currency: "usd",
-    amount: total * 100,
+    amount: amount * 100,
   };
+
   return (
     <WidthContainer>
       <section className="grid grid-cols-1 gap-10 lg:grid-cols-2 w-full mt-20 ">
@@ -88,13 +91,13 @@ const Page = () => {
                 );
               })}
             <li className="text-center font-bold text-xl py-2">
-              Total: {formatPrice(total)}
+              Total: {formatPrice(amount)}
             </li>
           </ul>
         </div>
         <div className="my-10 w-11/12 mx-auto">
           <Elements stripe={stripePromise} options={options}>
-            <CheckoutForm total={total} />
+            <CheckoutForm total={amount} />
           </Elements>
         </div>
       </section>
