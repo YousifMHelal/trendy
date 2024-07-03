@@ -70,7 +70,7 @@ const Slider = () => {
           return (
             <Link
               href={link.href}
-              key={link.name}
+              key={link.href}
               className={cn("flex gap-3 items-center py-4 max-lg:px-4 pl-6", {
                 "bg-gradient-to-l from-muted-foreground to-secondary border-r-4 border-primary":
                   isActive,

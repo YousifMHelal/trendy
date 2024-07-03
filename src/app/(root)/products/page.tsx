@@ -6,7 +6,6 @@ import ProductsPagination from "@/components/ProductsPagination";
 import WidthContainer from "@/components/WidthContainer";
 import { Skeleton } from "@/components/ui/skeleton";
 import useProductsStore from "@/store/useProductsStore";
-import { LoaderPinwheel } from "lucide-react";
 import { useEffect } from "react";
 
 const Page = ({ searchParams }: any) => {
@@ -45,7 +44,7 @@ const Page = ({ searchParams }: any) => {
         <div className="w-full place-items-center grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-10 sm:gap-x-6 md:gap-y-10 lg:gap-x-8">
           {products ? (
             products.map((product: any) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product._id} product={product} />
             ))
           ) : (
             <div className="w-[80vw] h-48 mt-14 ">

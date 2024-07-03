@@ -21,7 +21,7 @@ const perks = [
       "we've placed 1% of sales to the preservation and restoration of the natural environment.",
   },
   {
-    name: "For the planet",
+    name: "For the",
     icon: Check,
     description:
       "we've placed 1% of sales to the preservation and restoration of the natural environment.",

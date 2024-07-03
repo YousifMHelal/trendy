@@ -1,8 +1,8 @@
 "use client";
 
 import ProductsPagination from "@/components/ProductsPagination";
-import { buttonVariants } from "@/components/ui/button";
 import {
+  Table,
   TableBody,
   TableCaption,
   TableCell,
@@ -11,8 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import useOrdersStore from "@/store/useGetOrders";
-import { Loader2, Table } from "lucide-react";
-import Link from "next/link";
+import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 
 const Page = ({ searchParams }: any) => {
@@ -47,24 +46,7 @@ const Page = ({ searchParams }: any) => {
               <TableHead className="text-center">Action</TableHead>
             </TableRow>
           </TableHeader>
-          {/* <TableBody>
-            {orders &&
-              orders.map(({ _id, totalAmount, products, buyer, createdAt }) => (
-                <TableRow key={_id}>
-                  <TableCell>{_id}</TableCell>
-                  <TableCell>{totalAmount}</TableCell>
-                  <TableCell>{buyer.email}</TableCell>
-                  <TableCell>
-                    {new Date(createdAt).toISOString().split("T")[0]}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Link href={`/admin/orders/${_id}`}>
-                      <a className="text-blue-500 hover:text-blue-700">View</a>
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody> */}
+          <TableBody></TableBody>
         </Table>
       )}
       <div className="my-10">

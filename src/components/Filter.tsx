@@ -1,8 +1,9 @@
 "use client";
 
 import useCategoriesStore from "@/store/useCategoriesStore";
+import useProductsStore from "@/store/useProductsStore";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
@@ -19,7 +20,10 @@ const Filter = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const params = new URLSearchParams(searchParams);
+  const params = useMemo(
+    () => new URLSearchParams(searchParams),
+    [searchParams]
+  );
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,15 +39,28 @@ const Filter = () => {
 
   const clearAllFilters = () => {
     params.delete("category");
+    params.set("min", "0");
+    params.set("max", "0");
     params.set("page", "1");
     router.replace(`${pathname}?${params.toString()}`);
   };
 
   const { categories, fetchCategories } = useCategoriesStore();
+  const { fetchProducts } = useProductsStore();
 
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  useEffect(() => {
+    const category = params.get("category") || "";
+    const page = parseInt(params.get("page") || "1");
+    const min = parseInt(params.get("min") || "0");
+    const max = parseInt(params.get("max") || "0");
+
+    fetchProducts(category, page, min, max);
+    console.log("filter: " + category, page, min, max);
+  }, [params, fetchProducts]);
 
   return (
     <div className="mt-4 flex justify-between">
@@ -57,8 +74,8 @@ const Filter = () => {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Categories</SelectLabel>
-                {categories.map(({ name, slug }) => (
-                  <SelectItem key={slug} value={slug}>
+                {categories.map(({ _id, name, slug }) => (
+                  <SelectItem key={_id} value={slug}>
                     {name}
                   </SelectItem>
                 ))}

@@ -51,20 +51,17 @@ const Categories = () => {
           {categories &&
             categories.map(
               ({
+                _id,
                 name,
                 slug,
                 image,
               }: {
+                _id: string;
                 name: string;
                 slug: string;
                 image: string | null;
               }) => (
-                <CategoryCard
-                  key={slug}
-                  name={name}
-                  slug={slug}
-                  image={image}
-                />
+                <CategoryCard key={_id} name={name} slug={slug} image={image} />
               )
             )}
         </div>

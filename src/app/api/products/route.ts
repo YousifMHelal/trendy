@@ -47,13 +47,30 @@ export const GET = async (req: any) => {
   const searchParams = new URLSearchParams(req.url.split("?")[1]);
   const category = searchParams.get("category");
   const page = parseInt(searchParams.get("page") || "1");
+  const min = parseInt(searchParams.get("min") || "0");
+  const max = parseInt(searchParams.get("max") || "0");
+
+  console.log("api: " + category, page, min, max);
 
   const PRODUCTS_PER_PAGE = 24;
 
   try {
     await connectToDb();
 
-    const query = category ? { category } : {};
+    const query: any = {};
+
+    if (category) {
+      query.category = category;
+    }
+
+    if (min !== undefined && min >= 0) {
+      query.price = { ...query.price, $gte: min };
+    }
+
+    if (max !== undefined && max > 0) {
+      query.price = { ...query.price, $lte: max };
+    }
+
     const products = await Product.find(query)
       .skip(PRODUCTS_PER_PAGE * (page - 1))
       .limit(PRODUCTS_PER_PAGE);
