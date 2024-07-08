@@ -1,5 +1,6 @@
 "use client";
 
+import React, { Suspense } from "react";
 import CheckoutForm from "@/components/CheckoutForm";
 import WidthContainer from "@/components/WidthContainer";
 import { formatPrice } from "@/lib/utils";
@@ -14,7 +15,7 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 );
 
-const Page = () => {
+const CheckoutContent = () => {
   const { items } = useCart();
 
   const searchParams = useSearchParams();
@@ -99,5 +100,11 @@ const Page = () => {
     </WidthContainer>
   );
 };
+
+const Page = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <CheckoutContent />
+  </Suspense>
+);
 
 export default Page;
