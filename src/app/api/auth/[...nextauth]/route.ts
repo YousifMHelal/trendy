@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextApiRequest, NextApiResponse } from "next";
 import connectToDb from "@/lib/db";
 import { User } from "@/models/UserModels";
 import bcrypt from "bcryptjs";
@@ -111,5 +111,9 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-const handler = (req: any, res: any) => NextAuth(req, res, authOptions);
+// Main handler for NextAuth
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  return NextAuth(req, res, authOptions);
+};
+
 export { handler as GET, handler as POST };
