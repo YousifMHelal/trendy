@@ -1,11 +1,12 @@
+import { NextRequest, NextResponse } from "next/server";
 import connectToDb from "@/lib/db";
 import { User } from "@/models/UserModels";
 import bcrypt from "bcryptjs";
-import nextAuth, { SessionStrategy } from "next-auth";
+import NextAuth, { NextAuthOptions, SessionStrategy } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_ID as string,
@@ -45,8 +46,8 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }: any) {
-      if (account.provider === "google") {
+    async signIn({ user, account }) {
+      if (account!.provider === "google") {
         const { email, name, image } = user;
         try {
           await connectToDb();
@@ -73,11 +74,10 @@ export const authOptions = {
 
       return true;
     },
-    async redirect({ url, baseUrl }: any) {
-      // Redirect to home page after successful login
+    async redirect({ url, baseUrl }) {
       return baseUrl;
     },
-    async session({ session, token }: any) {
+    async session({ session, token }) {
       if (token) {
         session.user = {
           id: token.id,
@@ -89,7 +89,7 @@ export const authOptions = {
       }
       return session;
     },
-    async jwt({ token, user }: any) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -111,6 +111,5 @@ export const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-const handler = nextAuth(authOptions);
-
+const handler = (req: any, res: any) => NextAuth(req, res, authOptions);
 export { handler as GET, handler as POST };
