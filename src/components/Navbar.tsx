@@ -7,6 +7,7 @@ import MobileNav from "./MobileNav";
 import UserNav from "./UserNav";
 import WidthContainer from "./WidthContainer";
 import { buttonVariants } from "./ui/button";
+import Image from "next/image";
 
 const Navbar = () => {
   const { data } = useSession();
@@ -21,7 +22,10 @@ const Navbar = () => {
               {/* Left side of navigation */}
               {/* Logo */}
               <div className="ml-4 text-xl font-bold flex lg:ml-0">
-                <Link href="/">Trendy</Link>
+                <Link href="/" className="flex items-center gap-2">
+                  <Image src="/logo.svg" alt="logo" width={23} height={23} />
+                  Trendy
+                </Link>
               </div>
               {/* Links */}
               <div className="hidden z-50 lg:flex gap-5 items-center lg:ml-8 lg:self-stretch">

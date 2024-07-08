@@ -43,15 +43,8 @@ const Page = () => {
     0
   );
 
-  console.log(cartTotal);
-
   const createCheckout = async () => {
-    const checkoutData = {
-      products: checkoutProducts,
-    };
-
     const total = cartTotal + fee;
-    localStorage.setItem("checkoutData", JSON.stringify(checkoutData));
     router.push(`/checkout?total=${total}`);
   };
 

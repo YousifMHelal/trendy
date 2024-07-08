@@ -166,7 +166,7 @@ const Page = ({ params }: ProductPageProps) => {
       <ProductReel
         href={`/products/?category=${product?.category}`}
         title={`Similar`}
-        subTitle={`Browse similar high-quality products just like ${product?.title}`}
+        subTitle={`Browse similar high-quality products just like ${product?.category}`}
         category={product?.category.toString()}
       />
     </WidthContainer>

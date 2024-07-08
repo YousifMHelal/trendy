@@ -1,42 +1,26 @@
 "use client";
 
 import CheckoutForm from "@/components/CheckoutForm";
-import { IProduct } from "@/components/ProductCard";
 import WidthContainer from "@/components/WidthContainer";
 import { formatPrice } from "@/lib/utils";
+import { useCart } from "@/store/useCart";
 import { Elements } from "@stripe/react-stripe-js";
 import { StripeElementsOptions, loadStripe } from "@stripe/stripe-js";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 );
 
-interface CheckoutData {
-  products: IProduct[];
-}
-
 const Page = () => {
-  const [checkoutData, setCheckoutData] = useState<CheckoutData | null>(null);
+  const { items } = useCart();
 
   const searchParams = useSearchParams();
   const amount = Number(searchParams.get("total"));
 
-  useEffect(() => {
-    try {
-      const data = localStorage.getItem("checkoutData");
-      if (data) {
-        setCheckoutData(JSON.parse(data));
-      }
-    } catch (error) {
-      console.error("Failed to retrieve checkout data:", error);
-    }
-  }, []);
-
-  const products = checkoutData?.products;
+  const products = items;
 
   const options: StripeElementsOptions = {
     mode: "payment",
@@ -50,14 +34,16 @@ const Page = () => {
         <div>
           <ul className="border-2 border-dashed px-5 py-3">
             {products &&
-              products.map((product) => {
-                const label = product.category.toString();
-                const image = product.images[0];
+              products.map((item) => {
+                const label = item.product.category.toString();
+                const image = item.product.images[0];
                 return (
-                  <li key={product._id} className="flex py-2 sm:py-5 border-b">
+                  <li
+                    key={item.product._id}
+                    className="flex py-2 sm:py-5 border-b">
                     <div className="flex-shrink-0">
                       <div className="relative h-14 w-14">
-                        {image && (
+                        {item.product.images && (
                           <Image
                             fill
                             src={image}
@@ -73,15 +59,24 @@ const Page = () => {
                           <div className="flex justify-between">
                             <h3 className="text-sm">
                               <Link
-                                href={`/products/${product.slug}`}
+                                href={`/products/${item.product.slug}`}
                                 className="font-medium text-gray-700 hover:text-gray-800">
-                                {product.title}
+                                {item.product.title.substring(0, 35) + " ..."}
                               </Link>
                             </h3>
                           </div>
-                          <div className="mt-1 flex text-sm">
+                          <div className="mt-1 flex gap-14 w-3/4 text-sm">
                             <p className="text-muted-foreground capitalize">
                               {label}
+                            </p>
+                            <p className="capitalize text-primary font-medium">
+                              {formatPrice(item.product.price)}
+                            </p>
+                            <p className="text-muted-foreground capitalize">
+                              {item.qty}
+                            </p>
+                            <p className="capitalize text-primary font-medium">
+                              {formatPrice(item.product.price * item.qty)}
                             </p>
                           </div>
                         </div>

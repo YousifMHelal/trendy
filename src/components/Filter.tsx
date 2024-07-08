@@ -3,7 +3,7 @@
 import useCategoriesStore from "@/store/useCategoriesStore";
 import useProductsStore from "@/store/useProductsStore";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import {
@@ -25,6 +25,24 @@ const Filter = () => {
     [searchParams]
   );
 
+  const { categories, fetchCategories } = useCategoriesStore();
+  const { fetchProducts, sortBy, order } = useProductsStore();
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  useEffect(() => {
+    const category = params.get("category") || "";
+    const page = parseInt(params.get("page") || "1");
+    const min = parseInt(params.get("min") || "0");
+    const max = parseInt(params.get("max") || "0");
+
+    if (category !== null && sortBy !== null && order !== null) {
+      fetchProducts(category, page, min, max, sortBy, order);
+    }
+  }, [params, fetchProducts, sortBy, order]);
+
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     params.set(name, value);
@@ -37,30 +55,25 @@ const Filter = () => {
     router.replace(`${pathname}?${params.toString()}`);
   };
 
+  const handleSortChange = (value: string) => {
+    const [newOrder, newSortBy] = value.split(" ");
+    fetchProducts(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      newSortBy,
+      newOrder
+    );
+  };
+
   const clearAllFilters = () => {
     params.delete("category");
-    params.set("min", "0");
-    params.set("max", "0");
+    params.delete("min");
+    params.delete("max");
     params.set("page", "1");
     router.replace(`${pathname}?${params.toString()}`);
   };
-
-  const { categories, fetchCategories } = useCategoriesStore();
-  const { fetchProducts } = useProductsStore();
-
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
-
-  useEffect(() => {
-    const category = params.get("category") || "";
-    const page = parseInt(params.get("page") || "1");
-    const min = parseInt(params.get("min") || "0");
-    const max = parseInt(params.get("max") || "0");
-
-    fetchProducts(category, page, min, max);
-    console.log("filter: " + category, page, min, max);
-  }, [params, fetchProducts]);
 
   return (
     <div className="mt-4 flex justify-between">
@@ -105,7 +118,7 @@ const Filter = () => {
         </Button>
       </div>
       <div className="w-44">
-        <Select name="sort">
+        <Select name="sort" onValueChange={handleSortChange}>
           <SelectTrigger>
             <SelectValue placeholder="Sort By" />
           </SelectTrigger>
@@ -114,8 +127,8 @@ const Filter = () => {
               <SelectLabel>Sort By</SelectLabel>
               <SelectItem value="asc price">Price (low to high)</SelectItem>
               <SelectItem value="desc price">Price (high to low)</SelectItem>
-              <SelectItem value="asc lastUpdated">Newest</SelectItem>
-              <SelectItem value="desc lastUpdated">Oldest</SelectItem>
+              <SelectItem value="asc createdAt">Oldest</SelectItem>
+              <SelectItem value="desc createdAt">Newest</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>

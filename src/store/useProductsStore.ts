@@ -12,31 +12,39 @@ interface ProductState {
     category?: string,
     page?: number,
     min?: number,
-    max?: number
+    max?: number,
+    sortBy?: string,
+    order?: string
   ) => void;
   loading: boolean;
   error: string | null;
+  sortBy: string | null;
+  order: string | null;
 }
 
 const useProductsStore = create<ProductState>((set) => ({
   productsData: { products: [], count: 0 },
-  loading: true,
+  loading: false,
   error: null,
+  sortBy: null,
+  order: null,
   fetchProducts: async (
     category?: string,
     page?: number,
     min?: number,
-    max?: number
+    max?: number,
+    sortBy?: string,
+    order?: string
   ) => {
     set({ loading: true, error: null });
     try {
       const url = new URL(`${process.env.NEXT_PUBLIC_URL}/api/products/`);
       url.searchParams.append("page", page?.toString() || "1");
-      if (category) url.searchParams.append("category", category);
+      if (category) url.searchParams.append("category", category); // Ensure category is appended correctly
       if (min !== undefined) url.searchParams.append("min", min.toString());
       if (max !== undefined) url.searchParams.append("max", max.toString());
-
-      console.log("store: " + category, page, min, max);
+      if (sortBy) url.searchParams.append("sortBy", sortBy);
+      if (order) url.searchParams.append("order", order);
 
       const res = await fetch(url.toString(), { cache: "no-store" });
 
@@ -47,7 +55,7 @@ const useProductsStore = create<ProductState>((set) => ({
       }
 
       const data: { products: IProduct[]; count: number } = await res.json();
-      set({ productsData: data, loading: false });
+      set({ productsData: data, loading: false, sortBy, order });
     } catch (error) {
       console.error("Error fetching products:", error);
       set({

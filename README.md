@@ -9,6 +9,7 @@
 - Zustand
 - Firebase
 - Mogodb
+- Resend
 
 ## <a name="features">🔋 Features</a>
 
@@ -30,6 +31,8 @@
 👉 **Checkout and Pay with Stripe:** Smooth and secure payment transactions using Stripe, enhancing user experience during the checkout process.
 
 👉 **product Orders:** Comprehensive order management system, providing a clear overview of all product-related transactions.
+
+👉 **Send Email:** Send email to confirm customer order after completing the checkout process.
 
 and many more, including code architecture and reusability
 
@@ -64,4 +67,7 @@ FIREBASE_API_KEY =
 #STRIPE
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY =
 STRIPE_SECRET_KEY =
+
+#RESEND
+RESEND_API_KEY =
 ```

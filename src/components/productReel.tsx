@@ -19,7 +19,7 @@ const ProductReel = (props: ProductReelProps) => {
 
   const [limitedProducts, setLimitedProducts] = useState<IProduct[]>([]);
 
-  const { productsData, fetchProducts, loading } = useProductsStore();
+  const { productsData, fetchProducts } = useProductsStore();
   const { products } = productsData;
 
   useEffect(() => {

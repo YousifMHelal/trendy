@@ -7,7 +7,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
 
@@ -25,7 +25,6 @@ type OrderData = {
 };
 
 const CheckoutForm = ({ total }: { total: number }) => {
-  console.log(total);
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -79,6 +78,7 @@ const CheckoutForm = ({ total }: { total: number }) => {
       });
       const clientSecret = await res.json();
 
+      await handleSendEMail();
       await handleCreateOrder();
       await clearCart();
 
@@ -108,6 +108,16 @@ const CheckoutForm = ({ total }: { total: number }) => {
     } catch (error: any) {
       throw new Error(error);
     }
+  };
+
+  const handleSendEMail = async () => {
+    const res = await fetch("api/send", {
+      method: "POST",
+      body: JSON.stringify({
+        amount: total,
+        fullName: user?.name,
+      }),
+    });
   };
 
   return (
