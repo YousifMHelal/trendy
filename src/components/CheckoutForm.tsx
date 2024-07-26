@@ -86,7 +86,7 @@ const CheckoutForm = ({ total }: { total: number }) => {
         clientSecret,
         elements,
         confirmParams: {
-          return_url: "http://localhost:3000/payment-confirm",
+          return_url: `${process.env.NEXT_PUBLIC_URL}/payment-confirm`,
         },
       });
 
